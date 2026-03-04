@@ -1,0 +1,13 @@
+      - name: Run Search Script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          # Melihat isi direktori untuk memastikan file ada
+          ls -R
+          
+          # Memberi izin eksekusi jika belum
+          chmod +x mambo1.sh
+          
+          # Jalankan dengan path yang jelas
+          ./mambo1.sh
+          
