@@ -1,0 +1,23 @@
+name: Telegram Bash Bot
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Jalan tiap 5 menit
+  workflow_dispatch: # Bisa dijalankan manual dari web GitHub
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get install jq googler
+
+      - name: Run Search Script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          # Di sini kamu panggil script bash kamu
+          bash mambo1.sh
+          
