@@ -1,39 +1,234 @@
-import { useEffect, useState } from 'react';
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sultan Bot - Modern Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0f1a;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(23, 30, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+        .bg-gradient-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10">
 
-export default function Home() {
-  const [messages, setMessages] = useState([]);
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white mb-1">SULTAN<span class="text-blue-500">BOT</span></h1>
+                <p class="text-slate-400 text-sm font-medium">Monitoring Aktivitas User Real-time</p>
+            </div>
+            
+            <div id="status-container" class="glass-card px-5 py-3 rounded-2xl flex items-center gap-4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Server Status</span>
+                    <span id="status-text" class="text-xs font-bold text-red-500">OFFLINE</span>
+                </div>
+                <div id="status-dot" class="status-dot bg-red-500 shadow-[0_0_10px_#ef4444]"></div>
+            </div>
+        </div>
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch('/api/update');
-        const data = await res.json();
-        setMessages(data.messages);
-      } catch (e) {
-        console.log('Error fetch:', e);
-      }
-    }, 1000);
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase">Uptime</p>
+                <h3 id="uptime" class="text-xl font-bold text-white">--:--</h3>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase">Memory Usage</p>
+                <h3 id="ram" class="text-xl font-bold text-white">-- MB</h3>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase">Total Pesan</p>
+                <h3 id="messages" class="text-xl font-bold text-white">0</h3>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase">Respon Bot</p>
+                <h3 class="text-xl font-bold text-white">&lt; 1.2s</h3>
+            </div>
+        </div>
 
-    return () => clearInterval(interval);
-  }, []);
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- User Activity Feed -->
+            <div class="lg:col-span-2 space-y-4">
+                <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[500px]">
+                    <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
+                        <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300">Live User Activity</h2>
+                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full font-bold">REAL-TIME</span>
+                    </div>
+                    
+                    <div id="activity-feed" class="flex-1 overflow-y-auto p-4 custom-scroll space-y-3">
+                        <div class="text-center py-10 opacity-30 italic text-sm text-slate-500">Menunggu data aktivitas dari bot...</div>
+                    </div>
+                </div>
+            </div>
 
-  return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2>Live Telegram Messages</h2>
-      <div
-        style={{
-          border: '1px solid #ccc',
-          padding: '10px',
-          height: '300px',
-          overflowY: 'scroll'
-        }}
-      >
-        {messages.map((msg, idx) => (
-          <div key={idx} style={{ margin: '5px 0', padding: '5px', background: '#f0f0f0', borderRadius: '5px' }}>
-            {msg.text}
-          </div>
-        ))}
-      </div>
+            <!-- Remote & Details -->
+            <div class="space-y-6">
+                <!-- Mini Remote -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300 mb-4">Quick Command</h2>
+                    <div class="space-y-3">
+                        <input type="text" id="cmd-input" placeholder="Ketik perintah..." 
+                            class="w-full bg-slate-800/50 border border-white/5 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500/50 transition-all">
+                        <button onclick="sendCommand()" class="w-full bg-gradient-blue text-white py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+                            Kirim Perintah
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bot Info -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300 mb-4">System Info</h2>
+                    <div class="space-y-4 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Platform</span>
+                            <span class="font-bold">Termux Android</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Python Version</span>
+                            <span class="font-bold">3.11.x</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">API Status</span>
+                            <span class="text-green-500 font-bold">Stable</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center">
+            <p class="text-[10px] text-slate-600 font-bold tracking-[0.5em] uppercase italic">Sultan Intelligence Dashboard • 2024</p>
+        </footer>
     </div>
-  );
-    }
+
+    <script>
+        const API_BASE = "http://localhost:5000/api";
+        let lastLogCount = 0;
+
+        async function sendCommand() {
+            const input = document.getElementById('cmd-input');
+            const cmd = input.value;
+            if(!cmd) return;
+
+            try {
+                await fetch(`${API_BASE}/execute`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ command: cmd })
+                });
+                input.value = "";
+            } catch (e) { console.error(e); }
+        }
+
+        async function updateData() {
+            try {
+                const res = await fetch(`${API_BASE}/stats`);
+                const data = await res.json();
+                
+                // Update Stats UI
+                document.getElementById('uptime').innerText = data.uptime;
+                document.getElementById('ram').innerText = data.ram;
+                document.getElementById('messages').innerText = data.messages;
+                
+                // Update Status
+                document.getElementById('status-text').innerText = "ONLINE";
+                document.getElementById('status-text').className = "text-xs font-bold text-green-500";
+                document.getElementById('status-dot').className = "status-dot bg-green-500 shadow-[0_0_10px_#22c55e]";
+
+                // Update Feed
+                if (data.logs.length !== lastLogCount) {
+                    const feed = document.getElementById('activity-feed');
+                    feed.innerHTML = data.logs.map(log => {
+                        const isCommand = log.level === 'COMMAND';
+                        const isRemote = log.level === 'REMOTE';
+                        
+                        return `
+                            <div class="glass-card p-4 rounded-2xl flex items-start gap-4 border-l-4 ${isCommand ? 'border-l-blue-500' : isRemote ? 'border-l-orange-500' : 'border-l-slate-700'}">
+                                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
+                                    <span class="text-[10px] font-bold text-slate-300">${log.user.charAt(0)}</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-bold text-white truncate">${log.user}</span>
+                                        <span class="text-[9px] text-slate-500 font-mono">${log.time}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">${log.action}</p>
+                                    <div class="mt-2 flex gap-2">
+                                        <span class="badge ${isCommand ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-500'}">${log.level}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    feed.scrollTop = feed.scrollHeight;
+                    lastLogCount = data.logs.length;
+                }
+            } catch (e) {
+                document.getElementById('status-text').innerText = "OFFLINE";
+                document.getElementById('status-text').className = "text-xs font-bold text-red-500";
+                document.getElementById('status-dot').className = "status-dot bg-red-500 shadow-[0_0_10px_#ef4444]";
+            }
+        }
+
+        setInterval(updateData, 2000);
+        updateData();
+
+        // Support Enter Key
+        document.getElementById('cmd-input').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') sendCommand();
+        });
+    </script>
+</body>
+</html>
